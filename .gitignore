@@ -1,0 +1,32 @@
+# Logs
+logs
+*.log
+
+# Environment variables
+.env
+
+# Dependency directories
+node_modules/
+public/bower_components/
+
+# Build artifacts
+dist/
+build/
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-*
+
+# Temporary files
+*.tmp
+
+# Testing and coverage reports
+coverage/
+
+# Generated files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
