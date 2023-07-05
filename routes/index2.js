@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var puppeteer = require('puppeteer');
-const { scrollPageToBottom } = require('puppeteer-autoscroll-down');
+const fs = require("fs");
 
 // /* GET home page. */
 // router.get('/', function(req, res, next) {
@@ -103,24 +103,29 @@ async function collectPhoneNumbersForAllResult() {
     // Step 3: Wait for search results
     await page.waitForSelector('.hfpxzc');
 
-    //scroll towards the end
-    await page.evaluate(async () => {
-        await new Promise((resolve) => {
-            var totalHeight = 0;
-            var distance = 200;
-            var timer = setInterval(() => {
-                var scrollHeight = document.querySelectorAll('.kA9KIf');
-                var scrollHeight = element.scrollHeight;
-                element.scrollBy(0, distance);
-                totalHeight += distance;
+    // //scroll towards the end
+    // async function autoScroll(page) {
+    //     await page.evaluate(async () => {
+    //         await new Promise((resolve) => {
+    //             var totalHeight = 0;
+    //             var distance = 200;
+    //             var timer = setInterval(() => {
+    //                 var scrollHeight = document.querySelectorAll('.m6QErb');
+    //                 console.log(scrollHeight);
+    //                 var scrollHeight = element.scrollHeight;
+    //                 element.scrollBy(0, distance);
+    //                 totalHeight += distance;
 
-                if (totalHeight >= scrollHeight) {
-                    clearInterval(timer);
-                    resolve();
-                }
-            }, 100);
-        });
-    });
+    //                 if (totalHeight >= scrollHeight) {
+    //                     clearInterval(timer);
+    //                     resolve();
+    //                 }
+    //             }, 100);
+    //         });
+    //     });
+    // }
+
+    // await autoScroll(page);
 
     // const url = await page.url();
     // console.log(url);
@@ -154,28 +159,40 @@ async function collectPhoneNumbersForAllResult() {
 
         // Step 5: Wait for phone number to appear
         await page.waitForSelector('.Io6YTe.fontBodyMedium.kR99db');
-
+        await page.waitForTimeout(1000);
         // Collecting info
         const clinic_content = await page.$$eval('.Io6YTe.fontBodyMedium.kR99db', clinic_content => {
             return clinic_content.map(clinic_content => clinic_content.textContent);
         });
 
+        let clinic_name = 'null';
+        let clinic_Pnum = 'null';
+        let clinic_adr = 'null';
+
         console.log("clinic_content", clinic_content)
 
-        let clinic_adr = clinic_content[0];
+        clinic_adr = clinic_content[0];
         console.log('clinic_adr is', clinic_adr);
 
-        let clinic_Pnum = clinic_content[2];
+        clinic_Pnum = clinic_content[2];
         console.log('clinic_Pnum is', clinic_Pnum);
 
-        let clinic_name = await page.$eval(
+        clinic_name = await page.$eval(
             '.DUwDvf', el => el.textContent
         );
         console.log('clinic_name is', clinic_name);
 
-        await page.waitForTimeout(5000);
+        await page.waitForTimeout(1000);
 
+        fs.appendFile(
+          "results.csv",
+          `${clinic_name},${clinic_adr},${clinic_Pnum}\n`,
+          function (err) {
+            if (err) throw err;
+          }
+        );
     }
+
 }
 
 // collectPhoneNumbersForFirstResult();
